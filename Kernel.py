@@ -56,7 +56,6 @@ class Kernel():
                         0.5 * self.Nf * self.pF * (self.lattice - self.pF) +
                         0.5 * self.Nf * self.pFb * (self.lattice - self.pFb))
         self.Ia = np.trapz(Ia_integrand, x=self.lattice) / (2*np.pi**2)
-        print(self.Ia)
 
         Ib_integrand = 2 * (self.Nc * self.pf +
                             0.5 * self.Nf * self.pF +
