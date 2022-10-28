@@ -38,13 +38,15 @@ class Kernel():
 
         self.compute_integrals()
         #self.compute_pt2()
-
+        """
         self.function_  = np.interp(self.lattice_[1:-1], self.lattice, self.function)
         self.Function_  = np.interp(self.lattice_[1:-1], self.lattice, self.Function)
-        self.Fbunction_ = np.interp(self.lattice_[1:-1], self.lattice, self.Function)
+        self.Fbunction_ = np.interp(self.lattice_[1:-1], self.lattice, self.Fbunction)
+        """
         self.pf_  = np.interp(self.lattice_[1:-1], self.lattice, self.pf)
         self.pF_  = np.interp(self.lattice_[1:-1], self.lattice, self.pF)
         self.pFb_ = np.interp(self.lattice_[1:-1], self.lattice, self.pFb)
+
 
         self.parameters()
 

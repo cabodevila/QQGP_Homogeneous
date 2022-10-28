@@ -34,7 +34,7 @@ class Elastic_kernel():
         p2Jqb = np.append(p2Jqb, 0)
         p2Jqb = np.insert(p2Jqb, 0, 0)
 
-        return 2 * np.pi * self.k.alphas**2 * self.k.Nc * p2Jg,  \
+        return 2 * np.pi * self.k.alphas**2 * self.k.Nc * p2Jg, \
                2 * np.pi * self.k.alphas**2 * self.k.CF * p2Jq, \
                2 * np.pi * self.k.alphas**2 * self.k.CF * p2Jqb #* np.log(self.k.pt2 / self.k.mD2)
 

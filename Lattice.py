@@ -29,8 +29,10 @@ class Lattice():
         self.function  = np.array([self.f0/self.alphas]*(len(self.lattice_)-1)) * \
                             np.heaviside(self.Qs - self.lattice, 0.5)
         # Quark distribution function
-        self.Function_ = np.zeros(len(self.lattice_))
-        self.Function  = np.zeros(len(self.lattice))
+        self.Function_ = np.array([self.f0/self.alphas]*len(self.lattice_)) * \
+                            np.heaviside(self.Qs - self.lattice_, 0.5)
+        self.Function  = np.array([self.f0/self.alphas]*(len(self.lattice_)-1)) * \
+                            np.heaviside(self.Qs - self.lattice, 0.5)
         # Antiquark distribution function
         self.Fbunction_ = np.zeros(len(self.lattice_))
         self.Fbunction  = np.zeros(len(self.lattice))

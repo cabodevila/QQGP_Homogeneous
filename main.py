@@ -7,7 +7,7 @@ import time
 # Define the parameters
 start = time.time()
 
-deltat = 1e-3
+deltat = 5e-3
 lenght = 200
 p_max = 1
 p_newspacing = 0.01
@@ -30,8 +30,8 @@ antiquarks = True
 
 compute = [elastic, inelastic, gluons, quarks, antiquarks]
 
-save = 1
-plot = 1
+save = 200
+plot = False
 
 # Check if data directory exists and ask for remove
 if os.path.isdir('data'):

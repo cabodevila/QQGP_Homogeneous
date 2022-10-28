@@ -30,8 +30,8 @@ class Evolution(Lattice):
         self.pf_  = self.lattice_ * self.function_  # gluon
         self.pF   = self.lattice  * self.Function   # quark
         self.pF_  = self.lattice_ * self.Function_  # quark
-        self.pFb  = self.lattice  * self.Fbunction   # antiquark
-        self.pFb_ = self.lattice_ * self.Fbunction_  # antiquark
+        self.pFb  = self.lattice  * self.Fbunction  # antiquark
+        self.pFb_ = self.lattice_ * self.Fbunction_ # antiquark
 
         # Save the lattice in a text file
         os.mkdir('data')
@@ -126,8 +126,6 @@ class Evolution(Lattice):
                     self.plot_results(i)
 
             self.next_step()
-
-
 
         return
 
@@ -252,6 +250,7 @@ class Evolution(Lattice):
         self.axs[1].set_xscale('log')
         self.axs[1].grid()
         self.axs[1].legend()
+        #self.axs[1].set_ylim((-0.2e-9, 0.2e-9))
 
 
         time = np.loadtxt('data/iterations.txt')

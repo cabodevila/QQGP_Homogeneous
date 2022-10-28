@@ -10,18 +10,15 @@ class Inelastic_kernel():
 
         self.k = kernel
 
-        self.lattice_aux1 = np.append(self.k.lattice, 2 * self.k.lattice[-1] - self.k.lattice[-2])
-        self.lattice_aux2 = np.insert(self.lattice_aux1, 0, 0)
+        self.lattice_aux = np.append(self.k.lattice, 2 * self.k.lattice[-1] - self.k.lattice[-2])
         self.function_aux = np.append(self.k.pf, 0)
-        self.Function_aux = np.append(self.k.pF, 0)
-        self.Function_aux = np.insert(self.Function_aux, 0, 0)
-        self.Fbunction_aux = np.append(self.k.pFb, 0)
-        self.Fbunction_aux = np.insert(self.Fbunction_aux, 0, 0)
-        self.extrf  = scpi.InterpolatedUnivariateSpline(self.lattice_aux1,
+        self.Function_aux = np.append(self.k.Function, 0)
+        self.Fbunction_aux = np.append(self.k.Fbunction, 0)
+        self.extrf  = scpi.InterpolatedUnivariateSpline(self.lattice_aux,
                                                         self.function_aux, ext=3)
-        self.extrF  = scpi.InterpolatedUnivariateSpline(self.lattice_aux2,
+        self.extrF  = scpi.InterpolatedUnivariateSpline(self.lattice_aux,
                                                         self.Function_aux, ext=3)
-        self.extrFb = scpi.InterpolatedUnivariateSpline(self.lattice_aux2,
+        self.extrFb = scpi.InterpolatedUnivariateSpline(self.lattice_aux,
                                                         self.Fbunction_aux, ext=3)
         self.pf  = self.extrf(self.k.lattice_)
         self.pF  = self.extrF(self.k.lattice_)
@@ -77,8 +74,8 @@ class Inelastic_kernel():
         for i, factor in enumerate(self.factors):
             new_grid = factor * p
             self.new_f.append(self.extrf(new_grid) / factor)
-            self.new_F.append(self.extrF(new_grid) / factor)
-            self.new_Fb.append(self.extrFb(new_grid) / factor)
+            self.new_F.append(self.extrF(new_grid))
+            self.new_Fb.append(self.extrFb(new_grid))
 
         return
 
@@ -93,35 +90,35 @@ class Inelastic_kernel():
         self.Fggg_b = (self.pf[i] * (p + self.new_f[2]) * (p + self.new_f[3]) -
                        self.new_f[2] * self.new_f[3] * (p + self.pf[i]))
 
-        self.Fgqqb_a = (self.new_f[0] * (p - self.pF[i]) * (p - self.new_Fb[1]) -
-                        self.pF[i] * self.new_Fb[1] * (p + self.new_f[0]))
-        self.Fgqqb_b = (self.pf[i] * (p - self.new_F[2]) * (p - self.new_Fb[3]) -
-                        self.new_F[2] * self.new_Fb[3] * (p + self.pf[i]))
+        self.Fgqqb_a = (self.new_f[0] * (1 - self.pF[i]) * (1 - self.new_Fb[1]) -
+                        self.pF[i] * self.new_Fb[1] * (p + self.new_f[0])) * p**2
+        self.Fgqqb_b = (self.pf[i] * (1 - self.new_F[2]) * (1 - self.new_Fb[3]) -
+                        self.new_F[2] * self.new_Fb[3] * (p + self.pf[i])) * p**2
 
-        self.Fgqbq_a = (self.new_f[0] * (p - self.pFb[i]) * (p - self.new_F[1]) -
-                        self.pFb[i] * self.new_F[1] * (p + self.new_f[0]))
-        self.Fgqbq_b = (self.pf[i] * (p - self.new_Fb[2]) * (p - self.new_F[3]) -
-                        self.new_Fb[2] * self.new_F[3] * (p + self.pf[i]))
+        self.Fgqbq_a = (self.new_f[0] * (1 - self.pFb[i]) * (1 - self.new_F[1]) -
+                        self.pFb[i] * self.new_F[1] * (p + self.new_f[0])) * p**2
+        self.Fgqbq_b = (self.pf[i] * (1 - self.new_Fb[2]) * (1 - self.new_F[3]) -
+                        self.new_Fb[2] * self.new_F[3] * (p + self.pf[i])) * p**2
 
-        self.Fqgq_a = (self.new_F[0] * (p + self.pf[i]) * (p - self.new_F[1]) -
-                       self.pf[i] * self.new_F[1] * (p - self.new_F[0]))
-        self.Fqgq_b = (self.pF[i] * (p + self.new_f[2]) * (p - self.new_F[3]) -
-                       self.new_f[2] * self.new_F[3] * (p - self.pF[i]))
+        self.Fqgq_a = (self.new_F[0] * (p + self.pf[i]) * (1 - self.new_F[1]) -
+                       self.pf[i] * self.new_F[1] * (1 - self.new_F[0])) * p**2
+        self.Fqgq_b = (self.pF[i] * (p + self.new_f[2]) * (1 - self.new_F[3]) -
+                       self.new_f[2] * self.new_F[3] * (1 - self.pF[i])) * p**2
 
-        self.Fqqg_a = (self.new_F[0] * (p - self.pF[i]) * (p + self.new_f[1]) -
-                       self.pF[i] * self.new_f[1] * (p - self.new_F[0]))
-        self.Fqqg_b = (self.pF[i] * (p - self.new_F[2]) * (p + self.new_f[3]) -
-                       self.new_F[2] * self.new_f[3] * (p - self.pF[i]))
+        self.Fqqg_a = (self.new_F[0] * (1 - self.pF[i]) * (p + self.new_f[1]) -
+                       self.pF[i] * self.new_f[1] * (1 - self.new_F[0])) * p**2
+        self.Fqqg_b = (self.pF[i] * (1 - self.new_F[2]) * (p + self.new_f[3]) -
+                       self.new_F[2] * self.new_f[3] * (1 - self.pF[i])) * p**2
 
-        self.Fqbgqb_a = (self.new_Fb[0] * (p + self.pf[i]) * (p - self.new_Fb[1]) -
-                         self.pf[i] * self.new_Fb[1] * (p - self.new_Fb[0]))
-        self.Fqbgqb_b = (self.pFb[i] * (p + self.new_f[2]) * (p - self.new_Fb[3]) -
-                         self.new_f[2] * self.new_Fb[3] * (p - self.pFb[i]))
+        self.Fqbgqb_a = (self.new_Fb[0] * (p + self.pf[i]) * (1 - self.new_Fb[1]) -
+                         self.pf[i] * self.new_Fb[1] * (1 - self.new_Fb[0])) * p**2
+        self.Fqbgqb_b = (self.pFb[i] * (p + self.new_f[2]) * (1 - self.new_Fb[3]) -
+                         self.new_f[2] * self.new_Fb[3] * (1 - self.pFb[i])) * p**2
 
-        self.Fqbqbg_a = (self.new_Fb[0] * (p - self.pFb[i]) * (p + self.new_f[1]) -
-                         self.pFb[i] * self.new_f[1] * (p - self.new_Fb[0]))
-        self.Fqbqbg_b = (self.pFb[i] * (p - self.new_Fb[2]) * (p + self.new_f[3]) -
-                         self.new_Fb[2] * self.new_f[3] * (p - self.pFb[i]))
+        self.Fqbqbg_a = (self.new_Fb[0] * (1 - self.pFb[i]) * (p + self.new_f[1]) -
+                         self.pFb[i] * self.new_f[1] * (1 - self.new_Fb[0])) * p**2
+        self.Fqbqbg_b = (self.pFb[i] * (1 - self.new_Fb[2]) * (p + self.new_f[3]) -
+                         self.new_Fb[2] * self.new_f[3] * (1 - self.pFb[i])) * p**2
 
         return
 
@@ -133,16 +130,16 @@ class Inelastic_kernel():
         integrand_gluon = 0
         integrand_quark = 0
         integrand_quarkb = 0
-        """
+
         integrand_gluon += self.spltr[0] * (self.Fggg_a/self.x**(5/2) - 0.5*self.Fggg_b)
         integrand_gluon -= self.spltr[1] * self.k.Nf * self.Fgqqb_b
         integrand_gluon += self.spltr[2] * (self.k.Nf/(2*self.k.CF)) * (self.Fqgq_a + self.Fqbgqb_a) / self.x**(5/2)
 
-        integrand_quark += self.spltr[1] * 2 * self.k.CF * self.Fgqqb_a / self.x**(5/2)
+        #integrand_quark += self.spltr[1] * 2 * self.k.CF * self.Fgqqb_a / self.x**(5/2)
         integrand_quark -= self.spltr[3] * self.Fqqg_b
         integrand_quark += self.spltr[3] * (self.Fqqg_a/self.x**(5/2))# - 0.5 * self.Fqqg_b)
 
-        integrand_quarkb += self.spltr[1] * 2 * self.k.CF * self.Fgqqb_a / self.x**(5/2)
+        #integrand_quarkb += self.spltr[1] * 2 * self.k.CF * self.Fgqqb_a / self.x**(5/2)
         integrand_quarkb -= self.spltr[3] * self.Fqbqbg_b
         integrand_quarkb += self.spltr[3] * (self.Fqbqbg_a/self.x**(5/2))# - 0.5 * self.Fqbqbg_b)
         """
@@ -158,7 +155,7 @@ class Inelastic_kernel():
         integrand_quarkb = self.spltr[1] * 2 * self.k.CF * self.Fgqbq_a / self.x**(5/2) \
                          - self.spltr[3] * self.Fqbqbg_b \
                          + self.spltr[3] * (self.Fqbqbg_a/self.x**(5/2))# - 0.5 * self.Fqbqbg_b)
-
+        """
 
         integral_gluon  = np.trapz(integrand_gluon, self.x)
         integral_quark  = np.trapz(integrand_quark, self.x)
@@ -211,6 +208,10 @@ class Inelastic_kernel():
         derivative_gluons  /= (2 * np.pi**2)
         derivative_quarks  /= (2 * np.pi**2)
         derivative_quarksb /= (2 * np.pi**2)
+
+        print(sum(derivative_quarks))
+        print(sum(derivative_quarksb))
+        print(sum(derivative_quarks - derivative_quarksb))
 
 
         return derivative_gluons, derivative_quarks, derivative_quarksb
